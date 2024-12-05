@@ -47,12 +47,25 @@ jobs:
           path: .buildozer
           key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('buildozer.spec') }}
 
+      # Fix permissions to prevent permission errors
+      - name: Fix permissions
+        run: sudo chown -R $USER:$USER $GITHUB_WORKSPACE
+
+      # Use pre-configured Buildozer Docker image
       - name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
+        run: |
+          docker run --rm \
+          -v ${{ github.workspace }}:/home/user/app \
+          -v ~/.buildozer:/home/user/.buildozer \
+          kivy/buildozer \
+          buildozer android debug
+
+      # Upload build artifacts
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
         with:
-          command: buildozer android debug
-          buildozer_version: master
+          name: package
+          path: bin/*
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
