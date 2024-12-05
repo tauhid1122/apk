@@ -51,6 +51,14 @@ jobs:
       - name: Fix permissions
         run: sudo chown -R $USER:$USER $GITHUB_WORKSPACE
 
+			# Verify buildozer.spec exists
+      - name: Check buildozer.spec
+        run: |
+          if [ ! -f buildozer.spec ]; then
+            echo "Error: buildozer.spec not found in the root directory!"
+            exit 1
+          fi
+
       # Use pre-configured Buildozer Docker image
       - name: Build with Buildozer
         run: |
